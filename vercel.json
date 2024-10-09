@@ -1,15 +1,8 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "connection.py",
-      "use": "@vercel/python"
+  "functions": {
+    "api/*.js": {
+      "excludeFiles": "**/*.csv"
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "connection.py"
-    }
-  ]
+  }
 }
