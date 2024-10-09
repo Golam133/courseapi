@@ -19,17 +19,29 @@ courses_collection = db['courses']
 interactions_collection = db['user_interactions']
 
 # Step 2: Define route to load CSV data into MongoDB
+
 @app.route('/load_data', methods=['POST'])
 def load_data():
-    course_file = r'C:\Users\User\Desktop\400\putaa - Sheet1 (1).csv'
-    interaction_file = r'C:\Users\User\Desktop\400\simulated_user_interactions.csv'
-    combined_df = pd.read_csv(course_file)
-    user_interaction_df = pd.read_csv(interaction_file)
-    combined_df.rename(columns={'Course ID': 'course_id'}, inplace=True)
-    courses_data = combined_df.to_dict(orient='records')
-    interactions_data = user_interaction_df.to_dict(orient='records')
+    # Google Drive direct download links
+    course_url = "https://drive.google.com/uc?export=download&id=1xZe7RCw_qit3322r_eQzItkyTLi5kTOr"
+    interaction_url = "https://drive.google.com/uc?export=download&id=1tQtShr5ptbOyZFYuPcJ_gcOsJ7RPSSRt"
+
+    # Fetch course CSV
+    response_courses = requests.get(course_url)
+    decoded_courses = response_courses.content.decode('utf-8')
+
+    # Fetch interaction CSV
+    response_interactions = requests.get(interaction_url)
+    decoded_interactions = response_interactions.content.decode('utf-8')
+
+    # Process CSVs
+    courses_data = list(csv.DictReader(decoded_courses.splitlines()))
+    interactions_data = list(csv.DictReader(decoded_interactions.splitlines()))
+
+    # Insert data into MongoDB
     courses_collection.insert_many(courses_data)
     interactions_collection.insert_many(interactions_data)
+
     return jsonify({"message": "Data successfully inserted into MongoDB!"}), 201
 
 # Step 3: Define route to retrieve all courses
